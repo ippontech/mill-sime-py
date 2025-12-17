@@ -1,0 +1,173 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mill-sime-py"
+version = "0.1.0"
+description = "Projet de gestion des fermiers"
+readme = "README.md"
+requires-python = "~=3.13.0"
+dependencies = [
+    "alembic>=1.17.2",
+    "fastapi[standard]>=0.122.0",
+    "maypy>=2.1.0",
+    "psycopg[binary]>=3.2.13",
+    "pydantic[email]>=2.12.5",
+    "pydantic-extra-types[phonenumbers]>=2.10.6",
+    "pydantic-settings>=2.12.0",
+    "sqlalchemy>=2.0.44",
+    "sqlmodel>=0.0.27",
+]
+
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "script" },
+    { include-group = "test" },
+]
+lint = [
+    "mypy[faster-cache]>=1.18.2",
+    "ruff>=0.14.6",
+]
+script = [
+    "invoke>=2.2.1",
+]
+test = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-env>=1.5.0",
+]
+# -----------------------------------------------
+# build & packaging
+
+[tool.hatch.build.targets.sdist]
+include = ["src/mill_sime"]
+
+[tool.hatch.build.targets.wheel]
+include = ["src/mill_sime"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/mill_sime" = "mill_sime"
+
+# -----------------------------------------------
+# Tests
+
+[tool.pytest]
+minversion = "9.0"
+required_plugins = [
+    "pytest-cov",
+    "pytest-env",
+]
+testpaths = [
+    "src",
+    "tests",
+]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+]
+
+[tool.pytest_env]
+DB_HOST = ""
+DB_PORT = "null"
+DB_USER = ""
+DB_PASSWORD = ""
+DB_NAME = ""
+DB_SCHEME = "sqlite"
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["src/mill_sime/secondary/alembic/*"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_also = [
+    "def .+: \\.\\.\\.",
+    "@abstracmethod",
+]
+
+# -----------------------------------------------
+# linters
+
+[tool.ruff]
+src = ["./src", "./tests"]
+line-length = 100
+indent-width = 4
+output-format = "full"
+show-fixes = true
+
+[tool.ruff.lint]
+explicit-preview-rules = true
+
+select = [
+    "A", # flake8-builtins : https://docs.astral.sh/ruff/rules/#flake8-builtins-a
+    "ANN", # flake8-annotations : https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
+    "ARG", # flake8-unused-arguments : https://docs.astral.sh/ruff/rules/#flake8-unused-arguments-arg
+    "B", # flake8-bugbear : https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4", # flake8-comprehensions : https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "F", # pyflakes : https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "FURB", # refurb : https://docs.astral.sh/ruff/rules/#refurb-furb
+    "Q", # flake8-quotes : https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+    "E", # pycodestyle : https://docs.astral.sh/ruff/rules/#error-e
+    "W", # pycodestyle : https://docs.astral.sh/ruff/rules/#warning-w
+    "I001", # isort : https://docs.astral.sh/ruff/rules/unsorted-imports/
+    "N", # pep8-naming : https://docs.astral.sh/ruff/rules/#pep8-naming-n
+    "PERF", # perflint : https://docs.astral.sh/ruff/rules/#perflint-perf
+    "PIE", # flake8-pie : https://docs.astral.sh/ruff/rules/#flake8-pie-pie
+    "PT", # flake8-pytest-style : https://docs.astral.sh/ruff/rules/#flake8-pytest-style-pt
+    "RET", # flake8-return : https://docs.astral.sh/ruff/rules/#flake8-return-ret
+    "RSE", # flake8-raise : https://docs.astral.sh/ruff/rules/#flake8-raise-rse
+    "RUF", # ruff-specific rules : https://docs.astral.sh/ruff/rules/#ruff-specific-rules-ruf
+    "S", # flake8-bandit : https://docs.astral.sh/ruff/rules/#flake8-bandit-s
+    "SIM", # flake8-simplify : https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
+    "T20", # flake8-print : https://docs.astral.sh/ruff/rules/#flake8-print-t20
+    "TRY", # tryceratops : https://docs.astral.sh/ruff/rules/#tryceratops-try
+    "UP", # pyupgrade : https://docs.astral.sh/ruff/rules/#pyupgrade-up
+]
+
+ignore = [
+    "ANN401", # https://docs.astral.sh/ruff/rules/any-type/#any-type-ann401
+    "A003", # builtin-attribute-shadowing
+    "E501", # ignore line length (beacause the formater do it before)
+]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ARG002", # https://docs.astral.sh/ruff/rules/unused-method-argument/#unused-method-argument-arg002 (fixtures pytest)
+    "S101", # https://docs.astral.sh/ruff/rules/assert/#assert-s101 (assert pytest)
+    "S105", # https://docs.astral.sh/ruff/rules/hardcoded-password-string/#hardcoded-password-string-s105
+    "PT011", # https://docs.astral.sh/ruff/rules/pytest-raises-too-broad/
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+# Permet d'avoir des collections (dict, list) sur plusieurs lignes sans que ruff ne le reformate en
+# une seule en ajoutant explicitement une virgule à la fin
+skip-magic-trailing-comma = false
+
+[tool.mypy]
+# Import discovery
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+strict = true
+
+# Untyped definitions and calls
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = true
+disallow_any_generics = true
+disallow_untyped_decorators = false
+
+# Configuring error messages
+show_error_context = true
+show_column_numbers = true
+show_error_codes = true
+pretty = true

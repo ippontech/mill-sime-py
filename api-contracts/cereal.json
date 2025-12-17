@@ -1,0 +1,75 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cereal API",
+    "description": "Cereal API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Register a cereal",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterCerealRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cereal registered"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "Cereal already exists"
+          },
+          "404": {
+            "description": "Farmer not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegisterCerealRequest": {
+        "type": "object",
+        "required": [
+          "cereal",
+          "farmerId",
+          "deliveryDate",
+          "quantity"
+        ],
+        "properties": {
+          "cereal": {
+            "type": "string",
+            "description": "Cereal name"
+          },
+          "farmerId": {
+            "type": "string",
+            "description": "Identifier of the farmer providing the cereal",
+            "example": "f8351282-0c2b-47eb-a0eb-d663fe989376"
+          },
+          "deliveryDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date to deliver the cereal"
+          },
+          "quantity": {
+            "description": "Quantity of Cereal (tons)",
+            "type": "number",
+            "format": "double",
+            "minimum": 1,
+            "maximum": 8.5
+          }
+        }
+      }
+    }
+  }
+}

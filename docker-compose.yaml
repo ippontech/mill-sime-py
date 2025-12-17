@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:17.6-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=mill_db
+      - POSTGRES_PASSWORD=
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    # All data is wiped when the container is removed.
+    volumes:
+      - type: tmpfs
+        target: /var/lib/postgresql/data

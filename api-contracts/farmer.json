@@ -1,0 +1,224 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Farmer API",
+    "description": "Farmer API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/farmers/{farmer_id}": {
+      "get": {
+        "tags": [
+          "farmers"
+        ],
+        "summary": "Get Farmer By Id",
+        "operationId": "get_farmer_by_id_api_farmers__farmer_id__get",
+        "parameters": [
+          {
+            "name": "farmer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Farmer Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FarmerOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/farmers/": {
+      "post": {
+        "tags": [
+          "farmers"
+        ],
+        "summary": "Create Farmer",
+        "operationId": "create_farmer_api_farmers__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFarmerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Farmer already exists"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateFarmerRequest": {
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Firstname"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Lastname"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "title": "Phonenumber"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "phoneNumber"
+        ],
+        "title": "CreateFarmerRequest",
+        "examples": [
+          {
+            "email": "jean.dupont@fermier.fr",
+            "firstName": "Jean",
+            "lastName": "Dupont",
+            "phoneNumber": "+33 123456789"
+          }
+        ]
+      },
+      "FarmerOutput": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "firstName": {
+            "type": "string",
+            "title": "Firstname"
+          },
+          "lastName": {
+            "type": "string",
+            "title": "Lastname"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "title": "Phonenumber"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "firstName",
+          "lastName",
+          "email",
+          "phoneNumber"
+        ],
+        "title": "FarmerOutput",
+        "examples": [
+          {
+            "email": "jean.dupont@fermier.fr",
+            "firstName": "Jean",
+            "lastName": "Dupont",
+            "phoneNumber": "+33 123456789",
+            "reference": "e8cab89b-2751-4271-b1e4-9c3841be5d86"
+          }
+        ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
