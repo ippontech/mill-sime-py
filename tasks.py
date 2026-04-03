@@ -26,13 +26,3 @@ def lint(ctx: Context) -> None:
 def tests(ctx: Context) -> None:
     """Run unit tests"""
     ctx.run("echo Running tests && uv run pytest --cov")
-
-
-@task
-def start(ctx: Context, reload: bool = False, host: str = "localhost", port: int = 8000) -> None:
-    ctx.run("echo apply db migrations && uv run alembic upgrade head")
-    webbrowser.open(f"http://{host}:{port}/docs", autoraise=True)
-    ctx.run(
-        f"echo start server &&"
-        f" uv run uvicorn mill_sime.primary.main:app --host {host} --port {port} {'--reload' if reload else ''}"
-    )

@@ -1,5 +1,6 @@
 # Classe de base
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field
+from sqlmodel import SQLModel as SQLModel
 
 from mill_sime.domain.models.farmer import Farmer, FarmerReference
 

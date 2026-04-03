@@ -1,11 +1,12 @@
-from pydantic import AliasGenerator, BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from pydantic.alias_generators import to_camel
 
 
 class FarmerOutput(BaseModel):
     model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
         from_attributes=True,
-        alias_generator=AliasGenerator(serialization_alias=to_camel),
         json_schema_extra={
             "examples": [
                 {

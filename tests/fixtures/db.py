@@ -2,7 +2,8 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 from sqlalchemy import Engine, StaticPool, create_engine, text
-from sqlmodel import SQLModel
+
+from mill_sime.secondary.tables import SQLModel
 
 
 @contextmanager

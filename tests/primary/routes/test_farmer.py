@@ -1,27 +1,30 @@
+import json
 from collections.abc import Iterator
-from http import HTTPStatus
+from http import HTTPMethod, HTTPStatus
 
 import pytest
-from fastapi.testclient import TestClient
-from pydantic_extra_types.phone_numbers import PhoneNumber
 from tests.fixtures.db import get_sqlite_engine
+from tests.fixtures.events import create_api_call
 
-from mill_sime.dependencies import get_engine
-from mill_sime.primary.main import app
-from mill_sime.primary.routes.farmer import FARMER_BASE_PATH
+from mill_sime.dependencies import container
+from mill_sime.primary.common.uri import BASE_API_URI, FARMER_API_URI
+from mill_sime.primary.handler import lambda_handler
+
+FARMER_BASE_PATH = f"{BASE_API_URI}{FARMER_API_URI}"
 
 
 class TestFarmerResource:
     @pytest.fixture(autouse=True)
     def setup(self) -> Iterator[None]:
-        with TestClient(app) as client, get_sqlite_engine() as engine:
-            self.client = client
-            self.engine = engine
-            app.dependency_overrides[get_engine] = lambda: engine
+        with (
+            get_sqlite_engine() as engine,
+        ):
+            container.engine.override(engine)
 
             yield
-
-            app.dependency_overrides = {}
+            container.engine.reset_override()
+            # Reset singletons, otherwise the closed connection will be reused.
+            container.reset_singletons()
 
     def test_create_new_farm(self) -> None:
         request = {
@@ -30,10 +33,10 @@ class TestFarmerResource:
             "lastName": "Dupont",
             "phoneNumber": "+33 123456789",
         }
-        response = self.client.post(FARMER_BASE_PATH, json=request)
+        response = lambda_handler(*create_api_call(FARMER_BASE_PATH, HTTPMethod.POST, body=request))
 
-        assert response.status_code == HTTPStatus.CREATED
-        assert response.headers["Location"]
+        assert response["statusCode"] == HTTPStatus.CREATED
+        assert response["multiValueHeaders"]["Location"]
 
     def test_get_farmer_by_id(self) -> None:
         # Create a farmer to have data to retrieve
@@ -43,19 +46,25 @@ class TestFarmerResource:
             "lastName": "Martin",
             "phoneNumber": "+33 987654321",
         }
-        PhoneNumber()
-        create_response = self.client.post(FARMER_BASE_PATH, json=create_request)
-        assert create_response.status_code == HTTPStatus.CREATED
-        location = create_response.headers["Location"]
+
+        create_response = lambda_handler(
+            *create_api_call(FARMER_BASE_PATH, HTTPMethod.POST, body=create_request)
+        )
+        assert create_response["statusCode"] == HTTPStatus.CREATED
+        location = create_response["multiValueHeaders"]["Location"][0]
 
         # Get the farmer by ID
-        get_response = self.client.get(location)
+        get_response = lambda_handler(
+            *create_api_call(
+                location,
+                HTTPMethod.GET,
+            )
+        )
 
         # Assert the response
-        assert get_response.status_code == HTTPStatus.OK
-        body = get_response.json()
+        assert get_response["statusCode"] == HTTPStatus.OK
 
-        assert body == {
+        assert json.loads(get_response["body"]) == {
             "reference": location.removeprefix(f"{FARMER_BASE_PATH}/"),
             "firstName": "Jacques",
             "lastName": "Martin",

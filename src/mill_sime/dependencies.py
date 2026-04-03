@@ -1,19 +1,17 @@
-from typing import Annotated
+from dependency_injector.containers import DeclarativeContainer
+from dependency_injector.providers import Singleton
+from sqlalchemy import create_engine
 
-from fastapi import Depends
-from sqlalchemy import Engine, create_engine
-
+from mill_sime import primary
 from mill_sime.config import setting
 from mill_sime.domain.ports.farmer_repository import FarmerRepository
 from mill_sime.secondary.farmer_repository import SqlAlchemyFarmerRepository
 
 
-def get_engine() -> Engine:
-    return create_engine(setting.db_url)
+class Container(DeclarativeContainer):
+    engine = Singleton(create_engine, setting.db_url)
+    farmer_repository: Singleton[FarmerRepository] = Singleton(SqlAlchemyFarmerRepository, engine)
 
 
-def get_farmer_repository(engine: Annotated[Engine, Depends(get_engine)]) -> FarmerRepository:
-    return SqlAlchemyFarmerRepository(engine)
-
-
-FarmerRepositoryDep = Annotated[FarmerRepository, Depends(get_farmer_repository)]
+container = Container()
+container.wire(packages=[primary])

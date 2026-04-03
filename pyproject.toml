@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = "~=3.13.0"
 dependencies = [
     "alembic>=1.17.2",
-    "fastapi[standard]>=0.122.0",
+    "aws-lambda-powertools[tracer]>=3.23.0",
     "maypy>=2.1.0",
     "psycopg[binary]>=3.2.13",
     "pydantic[email]>=2.12.5",
@@ -18,10 +18,13 @@ dependencies = [
     "pydantic-settings>=2.12.0",
     "sqlalchemy>=2.0.44",
     "sqlmodel>=0.0.27",
+    "dependency-injector>=4.48.3",
 ]
 
 [dependency-groups]
 dev = [
+    "boto3>=1.42.13",
+    "botocore>=1.42.13",
     { include-group = "lint" },
     { include-group = "script" },
     { include-group = "test" },
@@ -37,6 +40,7 @@ test = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-env>=1.5.0",
+    "mockito>=1.5.5",
 ]
 # -----------------------------------------------
 # build & packaging

@@ -4,7 +4,7 @@ from alembic import context
 from sqlalchemy import create_engine, pool
 
 from mill_sime.config import setting
-from mill_sime.secondary.tables import SQLModel  # type: ignore[attr-defined]
+from mill_sime.secondary.tables import SQLModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -44,7 +44,7 @@ Au moment où le fermier précise son choix de céréales à livrer, il doit dé
 
 En tant que membre de l'équipe de développement, vous aurez sûrement besoin d'avoir les informations sur la stack technique et l'architecture du projet.
 
-L'architecture applicative se résume pour l'heure à un ensemble d'API.  
+L'architecture applicative se résume pour l'heure à un ensemble d'API dans une **architecture serverless** avec des **AWS Lambdas**.  
 La facturation a été isolée sur un microservice dédié et ne fera donc pas l'objet de votre périmètre technique.  
 
 Les périmètres fonctionnels "Gestion des fermiers" et "Import des matières premières" sont rassemblés au sein du même dépôt de code qui permet de déployer un microservice exposant des API REST.
@@ -54,7 +54,8 @@ L'architecture technique choisie pour ce microservice est [l'architecture hexago
 
 Concernant la stack technique, voici la liste des langages et frameworks utilisés :
 * python 3.13
-* fastapi 0.122.0
+* aws-lambda-powertools
+* dependency-injector
 * pytest
 * alembic
 
@@ -82,23 +83,3 @@ inv lint
 ```shell
 inv tests
 ```
-- Démarrer l'application
-```shell
-inv start
-```
-
-Par défaut en local, l'application utilisera une base SQLite, cependant, il est possible d'utiliser une base PostgreSQL.
-Un docker-compose permet de la mettre en place si besoin, il faudra par contre mettre à jour la configuration dans le [.env](/.env).
-```shell
-docker compose up -d
-```
-
-````.dotenv
-#.env
-DB_HOST="localhost"
-DB_PORT="5432"
-DB_USER="admin"
-DB_PASSWORD=""
-DB_NAME="mill_db"
-DB_SCHEME="psycopg"
-````
